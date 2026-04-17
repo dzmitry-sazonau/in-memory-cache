@@ -1,70 +1,67 @@
-# In-Memory Cache 🎯🚀💾
+# In-Memory Cache
 
-## Overview 📌💡🔍
+## Overview
 
-`in-memory-cache` is a simple, lightweight key-value cache implementation in Go. It provides basic operations to store, retrieve, and delete data in memory without external dependencies. 🎯✅📦
+`in-memory-cache` is a lightweight, thread-safe key-value cache with TTL (time-to-live) support in Go. Expired entries are removed lazily on access. No external dependencies.
 
-## Features ⚡✨🛠️
+## Features
 
-- Simple in-memory key-value storage
+- Thread-safe (uses `sync.Mutex`)
+- TTL per key with lazy expiration
 - Set, Get, and Delete operations
 - No external dependencies
-- Easy to integrate into any Go project
 
-## Installation 📥🔧💻
-
-To use `in-memory-cache`, simply include the package in your project:
+## Installation
 
 ```sh
- go get github.com/dzmitry-sazonau/in-memory-cache
+go get github.com/dzmitry-sazonau/in-memory-cache
 ```
 
-## Usage 🏗️📜⚙️
-
-### Import the package 📦📌👨‍💻
+## Usage
 
 ```go
 package main
 
 import (
 	"fmt"
-	"github.com/dzmitry-sazonau/in-memory-cache"
+	"log"
+	"time"
+
+	cache "github.com/dzmitry-sazonau/in-memory-cache"
 )
 
 func main() {
-	// Create a new cache instance
 	c := cache.New()
 
-	// Set a value
-	c.Set("username", "JohnDoe")
+	// Set a value with 5 second TTL
+	c.Set("userId", 42, time.Second*5)
 
 	// Get a value
-	value := c.Get("username")
-	fmt.Println("Username:", value)
+	val, err := c.Get("userId")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(val) // 42
 
 	// Delete a key
-	c.Delete("username")
-
-	// Try to get a deleted key
-	fmt.Println("Deleted key:", c.Get("username"))
+	c.Delete("userId")
 }
 ```
 
-## API Reference 📚📑💡
+## API Reference
 
 ### `New() *Cache`
-Creates a new cache instance. 🆕🗂️🚀
+Creates a new cache instance.
 
-### `Set(key string, value interface{})`
-Stores a value associated with a given key. 📝🔑📌
+### `Set(key string, value any, ttl time.Duration)`
+Stores a value with a given key and TTL duration.
 
-### `Get(key string) interface{}`
-Retrieves a value by its key. Returns `"unknown key"` if the key is not found. 🔍📦❓
+### `Get(key string) (any, error)`
+Retrieves a value by key. Returns an error if the key is not found or has expired. Expired entries are deleted on access.
 
 ### `Delete(key string)`
-Removes a value by its key. 🗑️🚮✅
+Removes a value by key.
 
-## License 📜⚖️🔖
+## License
 
-This project is licensed under the MIT License. ✅🔓📄
-
+This project is licensed under the MIT License.
